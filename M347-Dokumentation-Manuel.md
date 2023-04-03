@@ -56,3 +56,117 @@ Jeder Container hat eine spezifische Aufgabe. Man spricht deshalb von Microservi
 ### Orchestrierung
 
 Mithilfe der Container-Orchestrierung werden Deployment, Management, Skalierung und Vernetzung von Containern automatisiert. Heisst es hilft Container zu verwalten.
+
+
+
+## Container ausführen
+
+
+
+**Image herunterladen**
+
+```bash
+docker pull ubuntu:latest
+```
+
+**Container starten**
+
+```bash
+docker run -it --name my-ubuntu-container ubuntu:latest
+```
+
+Um zu überprüfen, **welche Container gestartet** sind können Sie docker ps (2. Terminal) verwenden:
+
+```bash
+docker ps
+```
+
+**Container stoppen**
+
+```bash
+docker stop my-ubuntu-container
+```
+
+**Container Löschen**
+
+`docker rm` löscht einen gestoppten Container, das Image bleeibt jedoch vorhanden.
+
+```bash
+docker rm my-ubuntu-container
+```
+
+**Image löschen**
+
+```bash
+docker rmi ubuntu:latest
+```
+
+
+
+**Image Namen**
+
+Docker-Image-Namen setzen sich aus drei Teilen zusammen:
+
+```bash
+source/imagename:tag
+```
+
+- **source** gibt den Namen der Organisatio (oder Person) an, die das Image erstellt hat, z.B. docker
+- **imagename** der Name des Images, z.B. getting-started
+- **tag** die Versionsnummer des Images, z.B. 22.04
+
+Wird keine source angegeben, nimmt docker an, dass eines der offiziellen Dockerimages gemeint ist. Wird kein tag angegeben, wird automatisch das tag latest verwendet.
+
+
+
+![1.4.1](https://gbssg.gitlab.io/m347/img/kap1/4-1.PNG)
+
+
+
+**Docker pull**
+
+```bash
+docker pull nginx
+```
+
+**Docker stop**
+
+```bash
+docker stop my-nginx-container
+```
+
+**Docker start**
+
+```bash
+docker start my-nginx-container
+```
+
+**Docker rm**
+
+```bash
+docker rm my-nginx-container
+```
+
+**Docker rmi**
+
+Zweck: Ein Image auf dem Host wird gelöscht. Es dürfen keine abgeleiteten Container von diesem Image vorhanden sein (weder laufend noch gestoppt)
+
+```bash
+docker rmi nginx
+```
+
+**Docker ps**
+
+Zeigt laufende Container, wenn -a auch noch gestoppte.
+
+```bash
+docker ps -a
+```
+
+**Docker images**
+
+```bash
+docker images
+docker image ls
+```
+
