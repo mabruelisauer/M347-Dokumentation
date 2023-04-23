@@ -170,3 +170,79 @@ docker images
 docker image ls
 ```
 
+
+
+## Portweiterleitungen
+
+Stellt ein Container einen Serverdienst über einen bestimmten Port zur Verfügung kann dieser mit einem anderen Port (oder auch dem gleichen) Port auf dem Host verknüpft werden.
+
+Läuft beispielsweise im Container eine Webanwendung auf Port 80 (http), läss sich dieser Port beim Start des Containers mit dem Parameter -p mit dem Port 80 des Hostrechners so verbinden
+
+```bash
+docker run  -p 80:80 <image>
+```
+
+Auf dem Host lässt sich somit die Webseite des Containers mit `http://localhost` öffnen
+
+Die Syntax für -p lautet
+
+```
+-p hostport:containerport
+```
+
+
+
+Für Webdienste üblich ist z.B. Port 8080:
+
+```
+docker run  -p 8080:80 <image>
+```
+
+Die Containerwebseite ist dann unter `http://localhost:8080` erreichbar.
+
+
+
+### Aufgabe Portweiterleitung
+
+Auf welchem Port läuft die Webseite im Container?
+
+Auf dem Container-Port
+
+Starten Sie einen Container aus getting-started, der auf dem Host auf http://localhost:8080 erreichbar ist
+
+1.  "getting-started" herunterladen
+
+   ``docker pull docker/getting-started``
+
+   ![image-20230423170615217](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230423170615217.png)
+
+2. Container starten. Mit -p den Host-Port 8080 und den standardmäßigen Container-Port von 80 angeben
+
+   ```bash
+   docker run -p 8080:80 docker/getting-started
+   ```
+
+![image-20230423171331127](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230423171331127.png)
+
+![image-20230423171416886](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230423171416886.png)
+
+
+
+Beenden Sie am Schluss den Container, löschen Sie ihn und auch das Image.
+
+```bash
+docker stop b967ea729bcd
+
+docker rm b967ea729bcd
+
+docker images
+docker rmi 3e4394f6b72f
+```
+
+![image-20230423173050965](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230423173050965.png)
+
+![image-20230423173204541](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230423173204541.png)
+
+![image-20230423173130239](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230423173130239.png)
+
+![image-20230423173222526](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230423173222526.png)
