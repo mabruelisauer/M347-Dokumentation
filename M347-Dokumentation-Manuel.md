@@ -530,3 +530,71 @@ docker run -it --name ubuntu_1 --network=my-network ubuntu:latest
 ```
 
 <img src="C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230424122457559.png" alt="image-20230424122457559" style="zoom:50%;" />
+
+Die Container sollen sich gegenseitig anpingen können
+
+```bash
+apt update
+apt install iputils-ping
+apt install net-tools
+```
+
+```bash
+ping ubuntu_2
+```
+
+![image-20230429161210557](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230429161210557.png)
+
+![image-20230429161407377](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230429161407377.png)
+
+Stoppen und Löschen sie alles wieder
+
+![image-20230429161708429](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230429161708429.png)
+
+```bash
+docker network rm my-network
+```
+
+
+
+### Einrichten einer Wordpress-Applikation
+
+Definieren Sie das docker-Netzwerk wp_net 192.168.200.0/24 mit Gateway 192.168.200.1
+
+```bash
+docker network create --driver=bridge --subnet=192.168.100.0/24 --gateway=192.168.100.1 wp_net
+```
+
+![image-20230429162209959](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230429162209959.png)
+
+Starten Sie einen mariadb-Container in diesem Netzwerk:
+
+```bash
+docker run -d --name wp_mariadb --network wp_net -e MYSQL_ROOT_PASSWORD=strenggeheim -e MYSQL_DATABASE=wp -e MYSQL_USER=wpuser -e MYSQL_PASSWORD=geheim -v wp_dbvolume:/var/lib/mysql mariadb
+```
+
+![image-20230429162817740](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230429162817740.png)
+
+
+
+Starten Sie einen phpmyadmin-Container ebenfalls in diesem Netzwerk:
+
+```bash
+docker run -d --name wp_pma --network wp_net -p 8080:80 -e PMA_HOST=wp_mariadb phpmyadmin/phpmyadmin
+```
+
+![image-20230429163106263](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230429163106263.png)
+
+Starten Sie nun den wordpress-Container mit:
+
+```bash
+docker run -d --name wp_wordpress --network wp_net -v wp_htmlvolume:/var/www/html/wp-content -p 8081:80 -e WORDPRESS_DB_HOST=wp_mariadb -e WORDPRESS_DB_USER=wpuser -e WORDPRESS_DB_NAME=wp -e WORDPRESS_DB_PASSWORD=geheim wordpress
+```
+
+![image-20230429164039109](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230429164039109.png)
+
+![image-20230429164009600](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230429164009600.png)
+
+IP-Adressen der drei Container:
+
+![image-20230429164304586](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230429164304586.png)
