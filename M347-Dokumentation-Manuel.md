@@ -598,3 +598,236 @@ docker run -d --name wp_wordpress --network wp_net -v wp_htmlvolume:/var/www/htm
 IP-Adressen der drei Container:
 
 ![image-20230429164304586](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230429164304586.png)
+
+
+
+## Images
+
+### Standardimages
+
+Das **Alpine**-Image ist im Gegensatz zu anderen Images klein und ist deshalb auch schnell gestartet.
+
+| Distribution | Image Grösse |
+| :----------- | ------------ |
+| alpine       | 6 MB         |
+| ubuntu       | 80 MB        |
+| debian       | 125 MB       |
+| oracle       | 250 MB       |
+
+Standardmässig kommt die rudimentäre `/bin/sh` Shell zum Zug. Bash lässt sich aber nachinstallieren:
+
+```shell
+apk add --update bash bash-completion
+```
+
+So probiert man es aus:
+
+```bash
+docker run -it --rm -h alpine --name alpine alpine
+```
+
+Man gelangt in eine interaktive root-Shell und kann z.B. die Version abfragen:
+
+```bash
+cat /etc/os-release
+```
+
+
+
+**Ubuntu** lässt sich starten mit:
+
+```bash
+docker run -it --name ubuntu-test ubuntu:latest
+```
+
+
+
+Das offizielle Image von **apache** enthält nur den apache http Server, also kein php. Um den Server zu testen können Sie dieses Kommando verwenden:
+
+```bash
+docker run -dit --name my-apache-app -p 8080:80 -v "$PWD":/usr/local/apache2/htdocs/ httpd:2.4
+```
+
+Dieses verbindet das lokale Arbeitsverzeichnis ($PWD) mit dem Serverroot. Die Webseite ist unter http://localhost:8080 verfügbar.
+
+
+
+**mariadb** wird von vielen Applikationen als Datenbankserver verwendet. Sie können ein mariadb Container starten mit:
+
+```bash
+mkdir dbvolume
+docker run -d --name mariadb -e MYSQL_ROOT_PASSWORD=geheim \
+-v $(pwd)/dbvolume:/var/lib/mysql mariadb
+```
+
+Dabei wird über eine Umgebungsvariable das root-Passwort gesetzt und das Datenbankverzeichnis im Container /var/lib/mysql auf das aktuelle Arbeitsverzeichnis/dbvolume gemountet.
+
+
+
+Weitere Umgebungsvariablen für dieses Image wären:
+
+| Variable                   | Bedeutung                                                    |
+| :------------------------- | :----------------------------------------------------------- |
+| MYSQL_ROOT_PASSWORD        | Das mysql root Passwort                                      |
+| MYSQL_DATABASE             | Wenn diese Variable gesetzt ist, wird beim ersten Start des Containers eine leere Datenbank mit dem angegebenen Namen erstellt. |
+| MYSQL_USER                 | Der angegebene Benutzer wird beim ersten Start des Containers erstellt und erhält alle Rechte (GRANT ALL) auf der in MYSQL_DATABASE angegeben Datenbank. |
+| MYSQL_PASSWORD             | Das Passwort für MYSQL_USER                                  |
+| MYSQL_ALLOW_EMPTY_PASSWORD | Wenn diese Variable auf yes gesetzt wird, kann bei MYSQL_ROOT_PASSWORD ein leeres Passwort gesetzt werden. Dies ist nicht zu empfehlen. |
+| MYSQL_RANDOM_ROOT_PASSWORD | Wird diese Variable aus yes gesetzt, wird ein zufällig erzeugtes root Passwort gesetzt. |
+
+
+
+### Eigene Images
+
+Kurz gesagt wird in einem Arbeitsverzeichnis die Datei mit Namen **Dockerfile** erstellt. Diese enthält in einer speziellen Syntax das Rezept um das Image anschliessend mit `docker build` zu erstellen. Mit `docker push` kann das Image bei Bedarf in den Dockerhub geladen werden.
+
+
+
+**Erstes Beispiel**
+
+Bei diesem Beispiel wird ein Image erstellt, welches einen Webserver startet und eine Seite ausliefert mit dem aktuellen Datum und Zeit.
+
+```bash
+cd bsp-apache-php
+```
+
+Erstellen Sie in diesem Verzeichnis eine neue Datei mit Namen Dockerfile und dem abgebildeten Inhalt:
+
+```bash
+# Datei: bsp-apache-php/Dockerfile
+FROM php:8-apache
+COPY index.php /var/www/html
+```
+
+
+
+Diese Datei gibt das Rezept an, wie ein Image erstellt wird. **FROM** gibt das verwendete Basisimage an. **COPY** kopiert die Datei index.php ins Verzeichnis /var/www/html im Container. Dieses Verzeichnis ist bei Apache das Standardverzeichnis für Webseiten, d.h. beim Aufruf der Webseite wird index.php aufgerufen von php bearbeitet und an den aufrufenden Browser ausgeliefert.
+
+Die Datei index.php muss natürlich noch erstellt werden und hat folgenden Inhalt:
+
+```php
+<!DOCTYPE html >
+<!-- Datei index.php -->
+<html >
+<head >
+<title >Beispiel</title >
+<meta charset ="utf-8" />
+</head >
+<body >
+<h1>Beispiel apache/php</h1>
+Serverzeit : <?php echo date("j. F Y, H:i:s, e "); ?>
+</body >
+</html >
+```
+
+Nun wird das Image mit folgendem Befehl erstellt:
+
+```bash
+docker build -t bsp-apache-php .
+```
+
+Überprüfen Sie den Erfolg mit dem Kommando:
+
+```bash
+docker image ls
+```
+
+Hier sollte (unter anderem) nun 2 Images aufgeführt werden:
+
+```
+REPOSITORY       TAG        IMAGE ID       CREATED              SIZE
+bsp-apache-php   latest     c5a049e80c58   About a minute ago   458MB
+php              8-apache   af944036d594   2 days ago           458MB
+```
+
+Nun kann aus dem Image ein Container gestartet werden:
+
+```bash
+docker run -d --name bsp-apache-php-container -p 8080:80 bsp-apache-php
+```
+
+Nun können Sie die Webseite http://localhost:8080 aufrufen
+
+
+
+**Zweites Beispiel**
+
+Hier sehen Sie ein etwas umfangreicheres Beispiel eines Dockerfiles für ein eigenes Webserver Image:
+
+```bash
+# Datei Dockerfile
+FROM ubuntu:latest
+
+LABEL maintainer "name@meine-webseite.ch "
+LABEL description "Webserver Image für www.meine-webseite.ch"
+
+# Umgebungsvariablen und Zeitzone einstellen
+# (erspart interaktive Rückfragen )
+ENV TZ="Europe/Zuerich" \
+    APACHE_RUN_USER=www-data \
+    APACHE_RUN_GROUP=www-data \
+    APACHE_LOG_DIR=/var/log/apache2
+
+# Zeitzone einstellen, Apache installieren, unnötige Dateien
+# aus dem Paket-Cache gleich wieder entfernen, HTTPS aktivieren
+RUN ln -snf /usr/share/zoneinfo/$TZ  /etc/localtime && \
+    echo $TZ > /etc/timezone && \
+    apt-get update && \
+    apt-get install -y apt-utils apache2 && \
+    apt-get -y clean && \
+    rm -r /var/cache/apt /var/lib/apt/lists/* && \
+    a2ensite default-ssl && \
+    a2enmod ssl
+
+# Ports 80 und 443 freigeben
+EXPOSE 80 443
+
+# Das Webroot-Verzeichnis als Volume definieren
+VOLUME /var/www/html
+
+# Startkommando für den Apache Webserver
+CMD ["/usr/sbin/apache2ctl" , "-D" , "FOREGROUND"]
+```
+
+Das Image wird nun erstellt mit
+
+```bash
+docker build -t meine-webseite-image
+```
+
+Ein aus dem Image abgeleiteter Container kann nun mit folgendem Kommando gestartet werden
+
+```bash
+docker run -d --name meine-webseite-container -p 8888:80 \
+-v /home/vmadmin/meine-webseite/site:/var/www/html meine-webseite-image
+```
+
+Das Verzeichnis site muss vorgängig erstellt werden und wird auf das Webroot-Verzeichnis abgebildet. Wenn Sie darin eine Indexdatei index.html erstellen, wird diese nun beim Aufruf von http://localhost:8888 angezeigt
+
+### Aufgabe
+
+![image-20230501103448439](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230501103448439.png)
+
+![image-20230501103652337](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230501103652337.png)
+
+![image-20230501110257692](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230501110257692.png)
+
+![image-20230501110809183](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230501110809183.png)
+
+Was ist der Unterschied zwischen COPY und ADD
+
+Der `ADD`-Befehl ist ähnlich dem `COPY`-Befehl, hat aber einige zusätzliche Funktionen. Der `ADD`-Befehl kann auch URLs als Quelle für das Kopieren von Dateien akzeptieren und kann auch Archive (wie `.tar` oder `.zip`) extrahieren und in das Docker-Image kopieren. Der Befehl hat das folgende Format:
+
+Unterschied zwischen CMD und ENTRYPOINT
+
+`CMD` definiert standardmäßig den Befehl oder die Anwendung, die beim Starten des Containers ausgeführt wird.
+
+Wenn der Docker-Container beim Starten ausgeführt wird, kann das `CMD` überschrieben werden, indem ein anderer Befehl als Argument an das `docker run`-Kommando übergeben wird.
+
+Im Gegensatz dazu definiert `ENTRYPOINT` den ausführbaren Befehl, der beim Start des Containers ausgeführt wird. 
+
+
+
+### Miniprojekt
+
+So guet wie fertig (Verlauf)
