@@ -828,6 +828,86 @@ Im Gegensatz dazu definiert `ENTRYPOINT` den ausführbaren Befehl, der beim Star
 
 
 
-### Miniprojekt
+## Docker compose
 
-So guet wie fertig (Verlauf)
+
+
+### Docker compose Aufgabe 1
+
+docker-compose.yml:
+
+```bash
+services:
+  wp_mariadb:
+    image: mariadb:latest
+    networks:
+    - wp_net
+    environment:
+    - MYSQL_ROOT_PASSWORD=strenggeheim
+    - MYSQL_DATABASE=wp
+    - MYSQL_USER=wpuser
+    - MYSQL_PASSWORD=geheim
+    volumes:
+    - wp_dbvolume:/var/lib/mysql
+
+  wp_wordpress:
+    image: wordpress:latest
+    networks:
+    - wp_net
+    environment:
+    - WORDPRESS_DB_HOST=wp_mariadb
+    - WORDPRESS_DB_USER=wpuser
+    - WORDPRESS_DB_NAME=wp
+    - WORDPRESS_DB_PASSWORD=geheim
+    volumes:
+	- wp_htmlvolume:/var/www/html/wp-content
+    ports:
+    - "8081:80"
+
+networks:
+  wp_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.200.0/24
+          gateway: 192.168.200.1
+
+volumes:
+  wp_dbvolume:
+  wp_htmlvolume:
+```
+
+
+
+![Docker compose](C:\Users\incre\Downloads\Docker compose.png)
+
+### Docker compose Aufgabe 2
+
+docker-compose.yml:
+
+```bash
+version: "3.8"
+
+services:
+ mariadb:
+  image: mariadb:latest
+  container_name: mymariadb
+  volumes:
+  - wp_dbvolume:/var/lib/mysql
+  environment:
+  - WORDPRESS_DB_HOST=wp_mariadb
+  - WORDPRESS_DB_USER=wpuser
+  - WORDPRESS_DB_NAME=wp
+  - WORDPRESS_DB_PASSWORD=geheim
+  ports:
+  - "8081:80"
+volumes:
+ wp_dbvolume:
+```
+
+
+
+![image-20230515113513910](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230515113513910.png)
+
+
+
