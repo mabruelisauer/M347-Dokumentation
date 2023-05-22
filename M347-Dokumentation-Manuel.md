@@ -911,3 +911,235 @@ volumes:
 
 
 
+## Lernziele
+
+
+
+**Sie können die Begriffe "Containerisierung", "Image", "Layer", "Container", "Repository", "Registry" und Dockerfile erklären**
+
+1. Containerisierung: Containerisierung ermöglicht es, Anwendungen in isolierten Behältern (Containern) auszuführen, die alle benötigten Dateien und Einstellungen enthalten. Dies sorgt für Konsistenz und Portabilität der Anwendung.
+2. Image: Ein Image ist eine Datei, die als Vorlage für die Erstellung von Containern dient. Es enthält alle benötigten Dateien und Konfigurationen, um eine Anwendung auszuführen.
+3. Layer: Ein Layer ist eine einzelne Schicht innerhalb eines Docker-Images. Images bestehen aus mehreren Schichten, die Änderungen und Ergänzungen zum Dateisystem enthalten. Layer ermöglichen eine effiziente Speicherung und Verwaltung von Images.
+4. Container: Ein Container ist eine isolierte Ausführungsumgebung für eine Anwendung. Es basiert auf einem Image und enthält alles, was benötigt wird, um die Anwendung auszuführen. Container sind konsistent und können auf verschiedenen Systemen ausgeführt werden.
+5. Repository: Ein Repository ist ein Speicherort für Docker-Images. Es ermöglicht das Speichern, Verwalten und Teilen von Images. Ein Repository enthält verschiedene Versionen und Varianten eines Images.
+6. Registry: Eine Registry ist ein Dienst, der als zentraler Speicherort für Docker-Images dient. Registries ermöglichen das Speichern, Verteilen und Verwalten von Images. Es gibt öffentliche Registries wie Docker Hub und private Registries für die interne Nutzung.
+7. Dockerfile: Ein Dockerfile ist eine Textdatei, die Anweisungen enthält, um ein Docker-Image zu erstellen. Es beschreibt den Aufbau des Images, wie das Basisimage ausgewählt wird, Dateien kopiert werden und welche Einstellungen vorgenommen werden. Dockerfiles automatisieren die Image-Erstellung und ermöglichen eine einfache Wiederholbarkeit und Anpassung.
+
+
+
+**Sie können die Begriffe Virtualisierung und Containerisierung voneinander trennen. **
+
+Virtualisierung:
+
+- Bei der Virtualisierung wird eine virtuelle Maschine (VM) erstellt, die als eigenständiger Computer fungiert und eine vollständige Betriebssysteminstanz mit allen benötigten Ressourcen enthält.
+- Jede virtuelle Maschine emuliert eine physische Hardwareebene und kann verschiedene Betriebssysteme und Anwendungen ausführen.
+- Virtualisierung ermöglicht die Isolierung von Anwendungen und bietet eine hohe Flexibilität, da verschiedene Betriebssysteme und Versionen parallel ausgeführt werden können.
+- Es erfordert jedoch mehr Ressourcen, da jede virtuelle Maschine ihre eigenen Betriebssystemressourcen benötigt.
+
+Containerisierung:
+
+- Bei der Containerisierung werden Anwendungen in isolierten Containern ausgeführt, die eine leichte und schnelle Alternative zur Virtualisierung bieten.
+- Containerisierung basiert auf der Nutzung des Host-Betriebssystems und des Kernel-Sharings, wodurch mehrere Container auf einem einzigen Host-System ausgeführt werden können.
+- Container teilen sich den Host-Kernel, sind jedoch in ihrer Umgebung isoliert, sodass jede Anwendung ihre eigenen Dateisysteme, Prozesse und Netzwerkschnittstellen hat.
+- Container sind leichtgewichtiger und starten schneller als virtuelle Maschinen. Sie bieten eine bessere Ressourceneffizienz und Skalierbarkeit.
+- Containerisierung ist ideal für die Bereitstellung von Microservices und die schnelle Entwicklung und Bereitstellung von Anwendungen.
+
+Zusammenfassend lässt sich sagen, dass Virtualisierung eine vollständige Virtualisierung von Hardware und Betriebssystemen ermöglicht, während Containerisierung auf der Isolierung von Anwendungen basiert und eine leichtgewichtige Alternative mit besserer Skalierbarkeit und Effizienz bietet.
+
+
+
+**Sie kennen die elementaren Commands, um Images und Container zu erzeugen, starten, beenden und löschen**
+
+
+
+**Sie können die wichtigsten Optionen von docker run (--name, --rm, --network, --ip, -d, -it, -p, -v, -e) korrekt anwenden**
+
+- `--name <name>`: Gibt dem Container einen Namen, mit dem er leicht identifiziert werden kann. Zum Beispiel: `docker run --name my-container image-name:tag`.
+- `--rm`: Löscht den Container automatisch, sobald er beendet wird. Dies ist praktisch, um temporäre Container zu erstellen, die nach der Ausführung nicht mehr benötigt werden. Zum Beispiel: `docker run --rm image-name:tag`.
+- `--network <network>`: Weist den Container einem bestimmten Docker-Netzwerk zu. Dadurch können Container miteinander kommunizieren, indem sie den Netzwerknamen verwenden. Zum Beispiel: `docker run --network my-network image-name:tag`.
+- `--ip <ip>`: Weist dem Container eine bestimmte IP-Adresse zu, wenn er mit einem benutzerdefinierten Netzwerk verbunden ist. Zum Beispiel: `docker run --network my-network --ip 192.168.0.10 image-name:tag`.
+- `-d`: Startet den Container im Hintergrund (detached mode), sodass er im Hintergrund ausgeführt wird und die Kontrolle an die Shell zurückgegeben wird. Zum Beispiel: `docker run -d image-name:tag`.
+- `-it`: Startet den Container im interaktiven Modus und bindet die Standardein- und -ausgabe an die Shell. Dies ermöglicht die interaktive Kommunikation mit dem Container. Zum Beispiel: `docker run -it image-name:tag`.
+- `-p <host-port>:<container-port>`: Leitet den Verkehr vom Host-Port zum Container-Port weiter, wodurch die Verbindung zur Anwendung im Container hergestellt wird. Zum Beispiel: `docker run -p 8080:80 image-name:tag` leitet den Verkehr vom Host-Port 8080 zum Container-Port 80 weiter.
+- `-v <host-path>:<container-path>`: Bindet einen Host-Verzeichnispfad an einen Pfad innerhalb des Containers. Dadurch können Daten zwischen dem Host und dem Container ausgetauscht werden. Zum Beispiel: `docker run -v /host/path:/container/path image-name:tag`.
+- `-e <key=value>`: Setzt eine Umgebungsvariable im Container. Diese Option kann verwendet werden, um Konfigurationswerte an die Anwendung im Container zu übergeben. Zum Beispiel: `docker run -e ENV_VARIABLE=value image-name:tag`.
+
+
+
+**Sie können verschiedene Versionen (tags) eines Container-Images nutzen**
+
+```bash
+docker run my-image:v1.0   // Startet den Container mit Tag v1.0
+docker run my-image:v1.1   // Startet den Container mit Tag v1.1
+docker run my-image:latest // Startet den Container mit dem als latest markierten Tag
+```
+
+Standardmässig nimmt es **latest**.
+
+
+
+**Sie können Portweiterleitungen in Betrieb nehmen**
+
+hostport:containerport
+
+Weitere Infos oben.
+
+
+
+**Sie können benannte und gemountete Volumen korrekt einsetzen**
+
+Volumename:Containerverzeichnis
+
+Hostverzeichnis:Containerverzeichnis
+
+Weitere Infos oben.
+
+
+
+**Sie verstehen den Standardaufbau eines Netzwerks mit Docker**
+
+Weitere Infos oben.
+
+
+
+**Sie können Docker-Netzwerke definieren und diese den Containern zuweisen**
+
+Weitere Infos oben.
+
+
+
+**Sie kennen die Syntax von Dockerfiles**
+
+1. - `FROM`: Gibt das Basisimage an, auf dem das neue Image aufgebaut wird.
+   - `RUN`: Führt einen Befehl innerhalb des Images aus, um Pakete zu installieren, Abhängigkeiten zu konfigurieren usw.
+   - `COPY` oder `ADD`: Kopiert Dateien oder Verzeichnisse vom Host in das Image.
+   - `WORKDIR`: Setzt das Arbeitsverzeichnis für nachfolgende Anweisungen innerhalb des Containers.
+   - `EXPOSE`: Deklariert die Ports, auf denen der Container Anwendungen verfügbar macht.
+   - `CMD` oder `ENTRYPOINT`: Gibt den Befehl an, der beim Starten des Containers ausgeführt werden soll.
+2. Variablen: Um die Lesbarkeit und Wiederverwendbarkeit des Dockerfiles zu verbessern, können Variablen verwendet werden. Sie werden mit dem Format `$VARIABLE_NAME` oder `${VARIABLE_NAME}` dargestellt und können entweder im Dockerfile selbst oder über Umgebungsvariablen gesetzt werden.
+3. Schichtenaufbau: Dockerfiles verwenden eine schichtbasierte Struktur. Jede Anweisung in einem Dockerfile erzeugt eine neue Schicht im Image. Schichten sind effizient, da sie wiederverwendet werden können, wenn sich die vorherigen Schichten nicht ändern.
+
+Beispiel:
+
+```dockerfile
+# Kommentar: Dockerfile für meine Anwendung
+
+# Setzen des Basisimages
+FROM ubuntu:latest
+
+# Ausführen von Anweisungen innerhalb des Images
+RUN apt-get update && apt-get install -y \
+    package1 \
+    package2
+
+# Kopieren von Dateien vom Host in das Image
+COPY app /app
+
+# Festlegen des Arbeitsverzeichnisses
+WORKDIR /app
+
+# Exponieren eines Ports
+EXPOSE 8080
+
+# Befehl, der beim Starten des Containers ausgeführt wird
+CMD ["python", "app.py"]
+```
+
+**Sie können die 12 verschiedenen Anweisungen von Dockerfiles erklären**
+
+
+
+**Sie können zwischen ENTRYPOINT und CMD sowie COPY und ADD unterscheiden** 
+
+`ENTRYPOINT` und `CMD` unterscheiden sich in ihrer Verwendung und ihrem Verhalten:
+
+- `ENTRYPOINT`: Definiert den Befehl oder das Skript, das immer ausgeführt wird, wenn der Container gestartet wird. Es stellt den Hauptbefehl des Containers dar und kann nicht überschrieben werden. Wenn `ENTRYPOINT` zusammen mit `CMD` verwendet wird, fungiert `CMD` als Argumente für `ENTRYPOINT`.
+- `CMD`: Gibt den Standardbefehl oder das Standardskript an, das beim Starten des Containers ausgeführt wird. Es kann überschrieben werden, indem beim Starten des Containers Befehle oder Argumente angegeben werden. Wenn `CMD` zusammen mit `ENTRYPOINT` verwendet wird, stellt `CMD` Argumente für den Befehl dar, der durch `ENTRYPOINT` angegeben ist.
+
+Beispiel
+
+```dockerfile
+FROM ubuntu:latest
+ENTRYPOINT ["echo", "Hello"]
+CMD ["world"]
+```
+
+
+
+- `COPY` und `ADD` werden verwendet, um Dateien oder Verzeichnisse vom Host in das Image zu kopieren, haben aber einige Unterschiede:
+
+- `COPY`: Kopiert Dateien oder Verzeichnisse vom Host in das Image. Es unterstützt grundlegende Kopierfunktionen und ist die bevorzugte Option, wenn Sie einfach Dateien in das Image kopieren möchten.
+
+- `ADD`: Ähnlich wie `COPY`, kann aber auch URLs oder TAR-Archive verarbeiten. Es hat zusätzliche Funktionen wie das Entpacken von TAR-Archiven und das Herunterladen von Inhalten von URLs. Es wird empfohlen, `ADD` nur zu verwenden, wenn Sie die spezifischen Funktionen benötigen.
+
+  Im Allgemeinen wird empfohlen, `COPY` für einfache Kopieroperationen zu verwenden und `ADD` nur dann einzusetzen, wenn die zusätzlichen Funktionen benötigt werden.
+
+
+
+## Miniprojekt
+
+1. Ein Lokales Verzeichnis **webserver** erstellen und auf das Verzeichnis werchseln.
+
+```bash
+mkdir webserver
+cd webserver
+```
+
+![image-20230519114214782](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230519114214782.png)
+
+2. Dockerfile und Dateistruktur erstellen
+
+```bash
+nano Dockerfile
+```
+
+Konfigurationen vornehmen
+
+```doc
+FROM nginx
+
+WORKDIR /usr/share/nginx/html
+
+COPY ./public/ /usr/share/nginx/html
+
+EXPOSE 8080
+
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+**From** bestimmt das Basisimage
+
+**Workdir** setzt das Arbeitsverzeichnis
+
+**Copy** kopiert Dateien aus dem Hostsystem ins Image
+
+**Expose** öffnet den angegebenen Port
+
+Der letzte Befehl ist dafür verantwortlich, dass sich Nginx beim Containerstart automatisch startet
+
+Dateistruktur für den **Copy** Befehl:
+
+![image-20230519121107102](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230519121107102.png)
+
+3. Image bauen
+
+```bash
+docker build -t mein-webserver .
+```
+
+-t steht für **Tag**, also zur Identifizierung des Images.
+
+Der Punkt am Ende bedeutet einfach, dass sich das Dockerfile im aktuellen Verzeichnis befindet.
+
+![image-20230519121343832](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230519121343832.png)
+
+4. Container starten
+
+```bash
+docker run -p 8080:80 -v /var/log:/var/log/nginx --name mein-container mein-webserver
+```
+
+![image-20230519123753121](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230519123753121.png)
+
+![image-20230519123832430](C:\Users\incre\AppData\Roaming\Typora\typora-user-images\image-20230519123832430.png)
+
