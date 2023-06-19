@@ -1,5 +1,3 @@
-
-
 # M347 Dokumentation
 
 
@@ -1310,6 +1308,12 @@ docker run -p 8080:80 -v /var/log:/var/log/nginx --name mein-container mein-webs
 
 ### Aufgabe 7.4-1
 
+.NET 7 installieren.
+
+
+
+Dockerfile:
+
 ```dockerfile
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
 WORKDIR /build
@@ -1358,6 +1362,8 @@ dotnet run
 code .
 ```
 
+Mongodb Container:
+
 ```bash
 docker run -d --name my-mongodb -p 27017:27017 -v mydata:/data/db mongo
 ```
@@ -1365,6 +1371,8 @@ docker run -d --name my-mongodb -p 27017:27017 -v mydata:/data/db mongo
 ```bash
 dotnet add package MongoDB.Driver
 ```
+
+Connection-String hardcode:
 
 ```c#
 using MongoDB.Driver;
@@ -1396,7 +1404,7 @@ app.MapGet("/check", () =>
 app.Run();
 ```
 
-Neues cs:
+Neues cs (kein hardgecodeter Connection-String mehr):
 
 ```c#
 using MongoDB.Driver;
@@ -1589,7 +1597,7 @@ services:
 
 **container_name**
 
-Der Name für den resultierenden Container bei docker ps (analog --name bei docker run)
+Der Name für den resultierenden Container bei docker ps (analog --name bei docker run)          
 
 ```yaml
 services: 
